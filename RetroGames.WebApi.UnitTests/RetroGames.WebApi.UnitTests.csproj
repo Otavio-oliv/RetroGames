@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RetroGames.WebApi\RetroGames.WebApi.csproj" />
+    <ProjectReference Include="..\RetroGames.Repository\RetroGames.Repository.csproj" />
   </ItemGroup>
 
 </Project>
