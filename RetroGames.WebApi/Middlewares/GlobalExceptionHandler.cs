@@ -45,9 +45,10 @@ public class GlobalExceptionHandler : IExceptionHandler
         httpContext.Response.StatusCode = statusCode;
 
         await httpContext.Response.WriteAsJsonAsync(
-            new RetroGamesResponseApiModel
+            new RetroGamesResponseApiModel<object>
             {
                 ResponseCode = responseCode,
+                Data = null,
                 ErrorMessage = errorMessage
             },
             cancellationToken);

@@ -1,8 +1,9 @@
+
 using Microsoft.AspNetCore.Mvc;
-using RetroGames.Services;
 using RetroGames.WebApi.ApiModels.Plataforma;
 using RetroGames.WebApi.ApiModels.Responses;
 using RetroGames.WebApi.Mappers;
+using RetroGames.Services;
 
 namespace RetroGames.WebApi.Controllers;
 
@@ -22,19 +23,18 @@ public class PlataformaController : ControllerBase
     {
         var plataformas = await _plataformaService.ListarAsync();
 
-        var response = plataformas
-            .Select(plataforma => plataforma.ParaResponse())
-            .ToList();
-
-        return Ok(new RetroGamesResponseApiModel<List<ListarPlataformaResponseApiModel>>
+        var response = new RetroGamesResponseApiModel<List<ListarPlataformaResponseApiModel>>
         {
             ResponseCode = ResponseCodes.SUCESSO,
-            Data = response
-        });
+            Data = plataformas.Select(p => p.ParaResponse()).ToList()
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> BuscarPorId(int id)
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> BuscarPorId(
+        int id)
     {
         var plataforma = await _plataformaService.BuscarPorIdAsync(id);
 
@@ -66,7 +66,7 @@ public class PlataformaController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<RetroGamesResponseApiModel>> Alterar(
+    public async Task<ActionResult<RetroGamesResponseApiModel<object>>> Alterar(
         int id,
         [FromBody] AlterarPlataformaRequestApiModel request)
     {
@@ -74,20 +74,23 @@ public class PlataformaController : ControllerBase
 
         await _plataformaService.AlterarAsync(plataforma);
 
-        return Ok(new RetroGamesResponseApiModel
+        return Ok(new RetroGamesResponseApiModel<object>
         {
-            ResponseCode = ResponseCodes.SUCESSO
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = null
         });
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<ActionResult<RetroGamesResponseApiModel>> Excluir(int id)
+    public async Task<ActionResult<RetroGamesResponseApiModel<object>>> Excluir(
+        int id)
     {
         await _plataformaService.ExcluirAsync(id);
 
-        return Ok(new RetroGamesResponseApiModel
+        return Ok(new RetroGamesResponseApiModel<object>
         {
-            ResponseCode = ResponseCodes.SUCESSO
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = null
         });
     }
 }
