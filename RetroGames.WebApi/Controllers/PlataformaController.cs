@@ -44,4 +44,50 @@ public class PlataformaController : ControllerBase
             Data = plataforma.ParaResponse()
         });
     }
+
+    [HttpPost]
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> Inserir(
+        [FromBody] InserirPlataformaRequestApiModel request)
+    {
+        var plataforma = request.ParaModel();
+
+        var criada = await _plataformaService.InserirAsync(plataforma);
+
+        var response = new RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = criada.ParaResponse()
+        };
+
+        return CreatedAtAction(
+            nameof(BuscarPorId),
+            new { id = criada.Id },
+            response);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<RetroGamesResponseApiModel>> Alterar(
+        int id,
+        [FromBody] AlterarPlataformaRequestApiModel request)
+    {
+        var plataforma = request.ParaModel(id);
+
+        await _plataformaService.AlterarAsync(plataforma);
+
+        return Ok(new RetroGamesResponseApiModel
+        {
+            ResponseCode = ResponseCodes.SUCESSO
+        });
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<RetroGamesResponseApiModel>> Excluir(int id)
+    {
+        await _plataformaService.ExcluirAsync(id);
+
+        return Ok(new RetroGamesResponseApiModel
+        {
+            ResponseCode = ResponseCodes.SUCESSO
+        });
+    }
 }
