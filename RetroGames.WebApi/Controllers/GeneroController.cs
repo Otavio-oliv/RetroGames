@@ -1,3 +1,5 @@
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetroGames.Services;
 using RetroGames.WebApi.ApiModels.Genero;
@@ -17,6 +19,7 @@ public class GeneroController : ControllerBase
         _generoService = generoService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<RetroGamesResponseApiModel<List<ListarGeneroResponseApiModel>>>> Listar()
     {

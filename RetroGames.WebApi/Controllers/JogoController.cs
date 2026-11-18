@@ -1,8 +1,9 @@
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetroGames.Services;
 using RetroGames.WebApi.ApiModels.Jogo;
 using RetroGames.WebApi.ApiModels.Responses;
+using RetroGames.WebApi.Configuration;
 using RetroGames.WebApi.Mappers;
 
 namespace RetroGames.WebApi.Controllers;
@@ -18,6 +19,7 @@ public class JogoController : ControllerBase
         _jogoService = jogoService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<RetroGamesResponseApiModel<PaginaResponseApiModel<ListarJogoResponseApiModel>>>> Listar(
         [FromQuery] ListarJogoRequestApiModel request)
@@ -27,7 +29,8 @@ public class JogoController : ControllerBase
             request.IdPlataforma,
             request.IdGenero,
             request.Pagina,
-            request.TamanhoPagina);
+            request.TamanhoPagina,
+            request.IncluirInativos);
 
         var response = new PaginaResponseApiModel<ListarJogoResponseApiModel>
         {
@@ -50,6 +53,7 @@ public class JogoController : ControllerBase
         });
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> ListarPorId(
         int id)
@@ -63,6 +67,7 @@ public class JogoController : ControllerBase
         });
     }
 
+    [Authorize(Policy = Politicas.Administrador)]
     [HttpPost]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Inserir(
         [FromBody] InserirJogoRequestApiModel request)
@@ -83,6 +88,7 @@ public class JogoController : ControllerBase
             response);
     }
 
+    [Authorize(Policy = Politicas.Administrador)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<RetroGamesResponseApiModel<object>>> Alterar(
         int id,
@@ -99,6 +105,7 @@ public class JogoController : ControllerBase
         });
     }
 
+    [Authorize(Policy = Politicas.Administrador)]
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<RetroGamesResponseApiModel<object>>> Excluir(
         int id)

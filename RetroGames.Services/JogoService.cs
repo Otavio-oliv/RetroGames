@@ -8,10 +8,14 @@ namespace RetroGames.Services;
 public class JogoService : IJogoService
 {
     private readonly IRepositorySet _repositorios;
+    private readonly IUsuarioAtualService _usuarioAtual;
 
-    public JogoService(IRepositorySet repositorios)
+    public JogoService(
+        IRepositorySet repositorios,
+        IUsuarioAtualService usuarioAtual)
     {
         _repositorios = repositorios;
+        _usuarioAtual = usuarioAtual;
     }
 
     public async Task<(List<JogoDetalheServiceModel> Jogos, int Total)> ListarAsync(
@@ -22,6 +26,10 @@ public class JogoService : IJogoService
         int tamanhoPagina = 10,
         bool incluirInativos = false)
     {
+        // Somente administradores podem visualizar jogos inativos.
+        var podeIncluirInativos =
+            incluirInativos && _usuarioAtual.EhAdministrador;
+
         IReadOnlyCollection<int>? idsJogos = null;
 
         // Se houver filtro por gênero, identifica os jogos desse gênero.
@@ -43,7 +51,7 @@ public class JogoService : IJogoService
             idsJogos,
             pagina,
             tamanhoPagina,
-            incluirInativos);
+            podeIncluirInativos);
 
         var jogosDetalhados = await MontarDetalhesAsync(jogos);
 
@@ -55,10 +63,14 @@ public class JogoService : IJogoService
         // Busca o jogo pelo identificador.
         var jogo = await _repositorios.Jogo.BuscarPorIdAsync(id);
 
-        // Se não existir, lança o erro de negócio correspondente.
-        if (jogo == null)
+        // Jogos inexistentes ou inativos para usuários comuns
+        // devem ser tratados como não encontrados.
+        if (jogo == null ||
+            (!jogo.Ativo && !_usuarioAtual.EhAdministrador))
+        {
             throw new BusinessRuleException(
                 BusinessErrors.JOGO_NAO_ENCONTRADO);
+        }
 
         // Monta os detalhes completos do jogo.
         var detalhes = await MontarDetalhesAsync(new List<Jogo> { jogo });
