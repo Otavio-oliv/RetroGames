@@ -1,3 +1,4 @@
+
 using RetroGames.Model.Model;
 
 namespace RetroGames.Repository.Interfaces;
@@ -13,6 +14,8 @@ public interface IJogoRepository
         bool incluirInativos = false);
 
     Task<Jogo?> BuscarPorIdAsync(int id);
+
+    Task<bool> ExisteComNomeAsync(string nome, int? idIgnorado = null);
 
     Task<int> InserirAsync(Jogo jogo);
 

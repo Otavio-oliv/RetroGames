@@ -22,4 +22,7 @@ public static class BusinessErrors
 
     public static readonly BusinessError GENERO_NAO_ENCONTRADO =
         new(105, "Gênero não encontrado.", HttpStatusCode.NotFound);
+
+    public static readonly BusinessError JOGO_NOME_DUPLICADO =
+        new(106, "Já existe um jogo com este nome.", HttpStatusCode.Conflict);
 }

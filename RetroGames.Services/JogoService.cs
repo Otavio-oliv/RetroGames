@@ -85,6 +85,11 @@ public class JogoService : IJogoService
         // Remove espaços desnecessários do nome.
         jogo.Nome = jogo.Nome.Trim();
 
+        // Verifica se já existe um jogo com o mesmo nome.
+        if (await _repositorios.Jogo.ExisteComNomeAsync(jogo.Nome))
+            throw new BusinessRuleException(
+                BusinessErrors.JOGO_NOME_DUPLICADO);
+
         // Todo jogo novo começa ativo.
         jogo.Ativo = true;
 
@@ -171,6 +176,15 @@ public class JogoService : IJogoService
         // Remove espaços desnecessários do nome.
         jogo.Nome = jogo.Nome.Trim();
 
+        // Verifica se outro jogo já utiliza este nome.
+        if (await _repositorios.Jogo.ExisteComNomeAsync(
+            jogo.Nome,
+            jogo.Id))
+        {
+            throw new BusinessRuleException(
+                BusinessErrors.JOGO_NOME_DUPLICADO);
+        }
+
         // Verifica se a plataforma existe.
         var plataforma = await _repositorios.Plataforma.BuscarPorIdAsync(
             jogo.IdPlataforma);
@@ -203,9 +217,6 @@ public class JogoService : IJogoService
         if (!idsGenerosUnicos.All(id => idsGenerosExistentes.Contains(id)))
             throw new BusinessRuleException(
                 BusinessErrors.GENERO_NAO_ENCONTRADO);
-
-        // Preserva o estado de ativação do jogo.
-        jogo.Ativo = jogoExistente.Ativo;
 
         // Configura a transação.
         var transactionOptions = new TransactionOptions

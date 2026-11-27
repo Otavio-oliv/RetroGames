@@ -127,6 +127,31 @@ public class JogoRepository : RepositoryBase, IJogoRepository
 
         return MapearJogo(reader);
     }
+    public async Task<bool> ExisteComNomeAsync(
+        string nome,
+        int? idIgnorado = null)
+    {
+        const string sql = """
+            SELECT COUNT(*) > 0
+            FROM tb_jogo
+            WHERE LOWER(TRIM(no_jogo)) = LOWER(@nome)
+              AND (
+                  @idIgnorado IS NULL
+                  OR co_seq_jogo <> @idIgnorado
+              );
+            """;
+
+        await using var connection = await OpenConnectionAsync();
+        await using var command = CreateCommand(connection, sql);
+
+        AddParameter(command, "nome", nome);
+        AddParameter(command, "idIgnorado", idIgnorado);
+
+        var resultado = await command.ExecuteScalarAsync();
+
+        return Convert.ToInt32(resultado) == 1;
+    }
+
 
     public async Task<int> InserirAsync(Jogo jogo)
     {
