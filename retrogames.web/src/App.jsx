@@ -1,14 +1,10 @@
+
 import { Routes, Route } from 'react-router-dom'
+
 import Layout from './layouts/Layout'
+import Catalogo from './pages/Catalogo'
+import DetalheJogo from './pages/DetalheJogo'
 import NaoEncontrada from './pages/NaoEncontrada'
-
-function Catalogo() {
-  return <h1>Catálogo de Jogos</h1>
-}
-
-function DetalheJogo() {
-  return <h1>Detalhes do Jogo</h1>
-}
 
 function App() {
   return (
