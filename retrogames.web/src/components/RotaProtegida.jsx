@@ -1,12 +1,15 @@
-
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
 import { useAutenticacao } from '../contexts/AutenticacaoContext'
 
-function RotaProtegida({ somenteAdministrador = false }) {
+function RotaProtegida({
+  somenteAdministrador = false,
+  somenteCliente = false,
+}) {
   const location = useLocation()
 
   const {
+    usuario,
     estaCarregando,
     estaAutenticado,
     ehAdministrador,
@@ -33,6 +36,13 @@ function RotaProtegida({ somenteAdministrador = false }) {
   }
 
   if (somenteAdministrador && !ehAdministrador) {
+    return <Navigate to="/" replace />
+  }
+
+  if (
+    somenteCliente &&
+    usuario?.perfil !== 'Cliente'
+  ) {
     return <Navigate to="/" replace />
   }
 

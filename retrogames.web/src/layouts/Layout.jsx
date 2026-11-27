@@ -1,7 +1,7 @@
-
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 import { useAutenticacao } from '../contexts/AutenticacaoContext'
+import { useCarrinho } from '../contexts/CarrinhoContext'
 
 function Layout() {
   const navigate = useNavigate()
@@ -13,6 +13,10 @@ function Layout() {
     ehAdministrador,
     sair,
   } = useAutenticacao()
+
+  const { quantidadeTotal } = useCarrinho()
+
+  const ehCliente = usuario?.perfil === 'Cliente'
 
   async function handleSair() {
     try {
@@ -53,15 +57,44 @@ function Layout() {
                 </li>
 
                 {!estaCarregando && !estaAutenticado && (
-                  <li className="nav-item">
-                    <Link className="nav-link" to="/login">
-                      Entrar
-                    </Link>
-                  </li>
+                  <>
+                    <li className="nav-item">
+                      <Link className="nav-link" to="/cadastro">
+                        Cadastrar-se
+                      </Link>
+                    </li>
+
+                    <li className="nav-item">
+                      <Link className="nav-link" to="/login">
+                        Entrar
+                      </Link>
+                    </li>
+                  </>
                 )}
 
                 {!estaCarregando && estaAutenticado && (
                   <>
+                    {ehCliente && (
+                      <>
+                        <li className="nav-item">
+                          <Link className="nav-link" to="/carrinho">
+                            Carrinho
+                            {quantidadeTotal > 0 && (
+                              <span className="badge rounded-pill text-bg-primary ms-1">
+                                {quantidadeTotal}
+                              </span>
+                            )}
+                          </Link>
+                        </li>
+
+                        <li className="nav-item">
+                          <Link className="nav-link" to="/meus-pedidos">
+                            Meus pedidos
+                          </Link>
+                        </li>
+                      </>
+                    )}
+
                     {ehAdministrador && (
                       <li className="nav-item dropdown">
                         <button

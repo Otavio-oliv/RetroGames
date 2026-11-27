@@ -39,8 +39,11 @@ builder.Services.AddAutorizacao();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+builder.Services.AddScoped<ValidarCsrfFilter>();
+
 builder.Services.AddControllers(options =>
 {
+    options.Filters.AddService<ValidarCsrfFilter>();
     options.Filters.Add<FluentValidationFilter>();
 });
 
@@ -60,7 +63,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         return new BadRequestObjectResult(
             new RetroGamesResponseApiModel<object>
             {
-                ResponseCode = 3,
+                ResponseCode = ResponseCodes.MODEL_STATE_INVALIDO,
                 Data = erros,
                 ErrorMessage = "Há um erro com o modelo enviado."
             });

@@ -1,5 +1,6 @@
 
 using System.Security.Claims;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -18,11 +19,31 @@ namespace RetroGames.WebApi.Controllers;
 public class AutenticacaoController : ControllerBase
 {
     private readonly IAutenticacaoService _autenticacaoService;
+    private readonly IAntiforgery _antiforgery;
 
     public AutenticacaoController(
-        IAutenticacaoService autenticacaoService)
+        IAutenticacaoService autenticacaoService,
+        IAntiforgery antiforgery)
     {
         _autenticacaoService = autenticacaoService;
+        _antiforgery = antiforgery;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("csrf-token")]
+    public ActionResult<RetroGamesResponseApiModel<object>> ObterTokenCsrf()
+    {
+        var tokens = _antiforgery.GetAndStoreTokens(HttpContext);
+
+        return Ok(
+            new RetroGamesResponseApiModel<object>
+            {
+                ResponseCode = ResponseCodes.SUCESSO,
+                Data = new
+                {
+                    token = tokens.RequestToken
+                }
+            });
     }
 
     [AllowAnonymous]
@@ -47,35 +68,36 @@ public class AutenticacaoController : ControllerBase
 
         var perfil = ObterNomePerfil(usuario.IdPerfil);
 
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-            new(ClaimTypes.Name, usuario.Nome),
-            new(ClaimTypes.Email, usuario.Email),
-            new(ClaimTypes.Role, perfil)
-        };
-
-        var identidade = new ClaimsIdentity(
-            claims,
-            CookieAuthenticationDefaults.AuthenticationScheme);
-
-        var principal = new ClaimsPrincipal(identidade);
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal);
+        await CriarSessaoAsync(usuario, perfil);
 
         return Ok(
             new RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>
             {
                 ResponseCode = ResponseCodes.SUCESSO,
-                Data = new UsuarioLogadoResponseApiModel
-                {
-                    Id = usuario.Id,
-                    Nome = usuario.Nome,
-                    Email = usuario.Email,
-                    Perfil = perfil
-                }
+                Data = CriarRespostaUsuario(usuario, perfil)
+            });
+    }
+
+    [AllowAnonymous]
+    [HttpPost("cadastrar")]
+    public async Task<ActionResult<RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>>> Cadastrar(
+        [FromBody] CadastroRequestApiModel request)
+    {
+        var usuario = await _autenticacaoService.CadastrarAsync(
+            request.Nome,
+            request.Email,
+            request.Senha);
+
+        var perfil = ObterNomePerfil(usuario.IdPerfil);
+
+        await CriarSessaoAsync(usuario, perfil);
+
+        return StatusCode(
+            StatusCodes.Status201Created,
+            new RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>
+            {
+                ResponseCode = ResponseCodes.SUCESSO,
+                Data = CriarRespostaUsuario(usuario, perfil)
             });
     }
 
@@ -110,6 +132,42 @@ public class AutenticacaoController : ControllerBase
                     Perfil = User.ObterPerfilUsuario()
                 }
             });
+    }
+
+    private async Task CriarSessaoAsync(
+        Usuario usuario,
+        string perfil)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new(ClaimTypes.Name, usuario.Nome),
+            new(ClaimTypes.Email, usuario.Email),
+            new(ClaimTypes.Role, perfil)
+        };
+
+        var identidade = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var principal = new ClaimsPrincipal(identidade);
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal);
+    }
+
+    private static UsuarioLogadoResponseApiModel CriarRespostaUsuario(
+        Usuario usuario,
+        string perfil)
+    {
+        return new UsuarioLogadoResponseApiModel
+        {
+            Id = usuario.Id,
+            Nome = usuario.Nome,
+            Email = usuario.Email,
+            Perfil = perfil
+        };
     }
 
     private static string ObterNomePerfil(int idPerfil)

@@ -1,4 +1,3 @@
-
 import { Routes, Route } from 'react-router-dom'
 
 import Layout from './layouts/Layout'
@@ -7,6 +6,9 @@ import RotaProtegida from './components/RotaProtegida'
 import Catalogo from './pages/Catalogo'
 import DetalheJogo from './pages/DetalheJogo'
 import Login from './pages/Login'
+import Cadastro from './pages/Cadastro'
+import Carrinho from './pages/Carrinho'
+import MeusPedidos from './pages/MeusPedidos'
 import NaoEncontrada from './pages/NaoEncontrada'
 
 import Jogos from './pages/Administracao/Jogos'
@@ -20,6 +22,12 @@ function App() {
         <Route path="/" element={<Catalogo />} />
         <Route path="/jogos/:id" element={<DetalheJogo />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<Cadastro />} />
+
+        <Route element={<RotaProtegida somenteCliente />}>
+          <Route path="/carrinho" element={<Carrinho />} />
+          <Route path="/meus-pedidos" element={<MeusPedidos />} />
+        </Route>
 
         <Route
           path="/admin"

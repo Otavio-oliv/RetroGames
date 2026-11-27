@@ -56,7 +56,7 @@ function Jogos() {
 
         setPlataformas(listaPlataformas)
         setGeneros(listaGeneros)
-      } catch (erro) {
+      } catch {
         if (ativo) {
           setMensagemAcao(
             'Não foi possível carregar as opções de filtro.'

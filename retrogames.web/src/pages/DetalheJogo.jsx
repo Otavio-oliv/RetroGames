@@ -1,6 +1,8 @@
-
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import {
+  Link,
+  useParams,
+} from 'react-router-dom'
 
 import {
   Carregando,
@@ -11,12 +13,23 @@ import { jogoApi } from '../services/servicos'
 import { obterMensagemErro } from '../services/erros'
 import { formatarPreco } from '../lib/formato'
 
+import { useAutenticacao } from '../contexts/AutenticacaoContext'
+import { useCarrinho } from '../contexts/CarrinhoContext'
+
 function DetalheJogo() {
   const { id } = useParams()
+  const { estaAutenticado, usuario } = useAutenticacao()
+  const { adicionarItem } = useCarrinho()
+
+  const ehCliente =
+    estaAutenticado && usuario?.perfil === 'Cliente'
 
   const [jogo, setJogo] = useState(null)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
+  const [mensagemCarrinho, setMensagemCarrinho] = useState('')
+  const [tipoMensagemCarrinho, setTipoMensagemCarrinho] =
+    useState('success')
 
   useEffect(() => {
     let ativo = true
@@ -50,6 +63,15 @@ function DetalheJogo() {
     }
   }, [id])
 
+  function handleAdicionarCarrinho() {
+    const resultado = adicionarItem(jogo)
+
+    setMensagemCarrinho(resultado.mensagem)
+    setTipoMensagemCarrinho(
+      resultado.sucesso ? 'success' : 'danger',
+    )
+  }
+
   if (carregando) {
     return <Carregando mensagem="Carregando detalhes do jogo..." />
   }
@@ -69,6 +91,9 @@ function DetalheJogo() {
   if (!jogo) {
     return null
   }
+
+  const disponivel =
+    jogo.ativo && Number(jogo.estoque) > 0
 
   return (
     <div>
@@ -99,7 +124,9 @@ function DetalheJogo() {
           {jogo.descricao ? (
             <p>{jogo.descricao}</p>
           ) : (
-            <p className="text-secondary">Descrição não disponível.</p>
+            <p className="text-secondary">
+              Descrição não disponível.
+            </p>
           )}
 
           <hr />
@@ -158,6 +185,56 @@ function DetalheJogo() {
               </p>
             </div>
           </div>
+
+          <hr />
+
+          {ehCliente && (
+            <div>
+              {mensagemCarrinho && (
+                <div
+                  className={`alert alert-${tipoMensagemCarrinho}`}
+                  role="alert"
+                >
+                  {mensagemCarrinho}
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={!disponivel}
+                onClick={handleAdicionarCarrinho}
+              >
+                {disponivel
+                  ? 'Adicionar ao carrinho'
+                  : 'Indisponível para compra'}
+              </button>
+
+              <Link
+                to="/carrinho"
+                className="btn btn-outline-secondary ms-2"
+              >
+                Ver carrinho
+              </Link>
+            </div>
+          )}
+
+          {!estaAutenticado && disponivel && (
+            <Link
+              to={`/login?voltarPara=${encodeURIComponent(
+                `/jogos/${jogo.id}`,
+              )}`}
+              className="btn btn-primary"
+            >
+              Entre para adicionar ao carrinho
+            </Link>
+          )}
+
+          {!ehCliente && estaAutenticado && (
+            <p className="text-secondary mb-0">
+              A compra pelo carrinho está disponível para contas de Cliente.
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Antiforgery;
 using RetroGames.WebApi.ApiModels.Responses;
 
 namespace RetroGames.WebApi.Configuration;
@@ -9,6 +10,16 @@ public static class AutenticacaoConfig
     public static IServiceCollection AddAutenticacao(
         this IServiceCollection services)
     {
+        services.AddAntiforgery(options =>
+        {
+            options.HeaderName = "X-CSRF-TOKEN";
+
+            options.Cookie.Name = "retrogames.csrf";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SameSite = SameSiteMode.Strict;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        });
+
         services
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>

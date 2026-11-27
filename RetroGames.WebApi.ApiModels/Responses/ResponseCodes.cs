@@ -10,4 +10,5 @@ public static class ResponseCodes
     public const int NAO_AUTENTICADO = 4;
     public const int ACESSO_NEGADO = 5;
     public const int CREDENCIAIS_INVALIDAS = 6;
+    public const int TOKEN_CSRF_INVALIDO = 7;
 }

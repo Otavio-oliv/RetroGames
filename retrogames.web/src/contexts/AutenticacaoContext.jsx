@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useContext,
@@ -66,6 +65,15 @@ export function AutenticacaoProvider({ children }) {
     return usuarioAutenticado
   }
 
+  async function cadastrar(nome, email, senha) {
+    const usuarioCadastrado =
+      await autenticacaoApi.cadastrar(nome, email, senha)
+
+    setUsuario(usuarioCadastrado)
+
+    return usuarioCadastrado
+  }
+
   async function sair() {
     try {
       await autenticacaoApi.sair()
@@ -85,6 +93,7 @@ export function AutenticacaoProvider({ children }) {
     estaAutenticado,
     ehAdministrador,
     entrar,
+    cadastrar,
     sair,
   }
 
@@ -95,6 +104,7 @@ export function AutenticacaoProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAutenticacao() {
   const contexto = useContext(AutenticacaoContext)
 

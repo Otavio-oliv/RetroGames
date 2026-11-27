@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -102,6 +101,16 @@ function Login() {
             </form>
 
             <div className="text-center mt-3">
+              <span className="text-secondary">
+                Ainda não possui uma conta?{' '}
+              </span>
+
+              <Link to="/cadastro" className="text-decoration-none">
+                Cadastre-se
+              </Link>
+            </div>
+
+            <div className="text-center mt-2">
               <Link to="/" className="text-decoration-none">
                 Voltar ao catálogo
               </Link>

@@ -229,6 +229,30 @@ public class JogoRepository : RepositoryBase, IJogoRepository
         await ExecuteWriteAsync(command);
     }
 
+    public async Task<bool> BaixarEstoqueAsync(
+        int id,
+        int quantidade)
+    {
+        const string sql = """
+            UPDATE tb_jogo
+            SET qt_estoque = qt_estoque - @quantidade
+            WHERE co_seq_jogo = @id
+              AND st_ativo = 1
+              AND qt_estoque >= @quantidade;
+            """;
+
+        await using var connection = await OpenConnectionAsync();
+        await using var command = CreateCommand(connection, sql);
+
+        AddParameter(command, "id", id);
+        AddParameter(command, "quantidade", quantidade);
+
+        var registrosAfetados = await ExecuteWriteAsync(command);
+
+        return registrosAfetados == 1;
+    }
+
+
     private string MontarFiltros(
         MySqlCommand command,
         string? busca,

@@ -28,6 +28,13 @@ public static class InjecaoDependenciaConfig
         services.AddScoped<ICondicaoJogoRepository, CondicaoJogoRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
+        services.AddScoped<
+            ISituacaoPedidoRepository,
+            SituacaoPedidoRepository>();
+
+        services.AddScoped<IPedidoRepository, PedidoRepository>();
+        services.AddScoped<IItemPedidoRepository, ItemPedidoRepository>();
+
         services.AddScoped<IRepositorySet, RepositorySet>();
 
         return services;
@@ -46,6 +53,7 @@ public static class InjecaoDependenciaConfig
         services.AddScoped<IGeneroService, GeneroService>();
         services.AddScoped<ICondicaoJogoService, CondicaoJogoService>();
         services.AddScoped<IJogoService, JogoService>();
+        services.AddScoped<IPedidoService, PedidoService>();
 
         return services;
     }

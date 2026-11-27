@@ -1,9 +1,18 @@
-
 import api from './api'
 
 export const autenticacaoApi = {
   async entrar(email, senha) {
     const response = await api.post('/Autenticacao/login', {
+      email,
+      senha,
+    })
+
+    return response.data.data
+  },
+
+  async cadastrar(nome, email, senha) {
+    const response = await api.post('/Autenticacao/cadastrar', {
+      nome,
       email,
       senha,
     })
@@ -85,6 +94,21 @@ export const generoApi = {
 export const condicaoJogoApi = {
   async listar() {
     const response = await api.get('/CondicaoJogo')
+    return response.data.data
+  },
+}
+
+export const pedidoApi = {
+  async criar(itens) {
+    const response = await api.post('/Pedido', {
+      itens,
+    })
+
+    return response.data.data
+  },
+
+  async listarMeus() {
+    const response = await api.get('/Pedido/meus')
     return response.data.data
   },
 }

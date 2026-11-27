@@ -1,4 +1,3 @@
-
 using System.Net;
 
 namespace RetroGames.Services;
@@ -22,6 +21,15 @@ public static class BusinessErrors
 
     public static readonly BusinessError GENERO_NAO_ENCONTRADO =
         new(105, "Gênero não encontrado.", HttpStatusCode.NotFound);
+
+    public static readonly BusinessError EMAIL_JA_CADASTRADO =
+        new(107, "Este e-mail já está cadastrado.", HttpStatusCode.Conflict);
+
+    public static readonly BusinessError JOGO_INDISPONIVEL =
+        new(108, "Um ou mais jogos não estão disponíveis.", HttpStatusCode.BadRequest);
+
+    public static readonly BusinessError ESTOQUE_INSUFICIENTE =
+        new(109, "Estoque insuficiente para um ou mais jogos.", HttpStatusCode.Conflict);
 
     public static readonly BusinessError JOGO_NOME_DUPLICADO =
         new(106, "Já existe um jogo com este nome.", HttpStatusCode.Conflict);

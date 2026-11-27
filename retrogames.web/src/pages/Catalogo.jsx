@@ -31,8 +31,6 @@ function Catalogo() {
     Number(searchParams.get('pagina')) || 1
   )
 
-  const [busca, setBusca] = useState(buscaUrl)
-
   const [plataformas, setPlataformas] = useState([])
   const [generos, setGeneros] = useState([])
 
@@ -45,11 +43,6 @@ function Catalogo() {
   const [erroFiltros, setErroFiltros] = useState('')
 
   const [tentativa, setTentativa] = useState(0)
-
-  // Mantém o campo de busca sincronizado com a URL.
-  useEffect(() => {
-    setBusca(buscaUrl)
-  }, [buscaUrl])
 
   // Carrega as opções dos filtros uma única vez.
   useEffect(() => {
@@ -156,8 +149,11 @@ function Catalogo() {
 
     const novosParametros = new URLSearchParams(searchParams)
 
-    if (busca.trim()) {
-      novosParametros.set('busca', busca.trim())
+    const formulario = new FormData(event.currentTarget)
+    const busca = String(formulario.get('busca') || '').trim()
+
+    if (busca) {
+      novosParametros.set('busca', busca)
     } else {
       novosParametros.delete('busca')
     }
@@ -205,9 +201,10 @@ function Catalogo() {
               id="busca"
               type="search"
               className="form-control"
+              name="busca"
               placeholder="Digite o nome do jogo..."
-              value={busca}
-              onChange={(event) => setBusca(event.target.value)}
+              key={buscaUrl}
+              defaultValue={buscaUrl}
             />
           </div>
 
@@ -265,10 +262,7 @@ function Catalogo() {
             <button
               type="button"
               className="btn btn-outline-secondary"
-              onClick={() => {
-                setBusca('')
-                setSearchParams({})
-              }}
+              onClick={() => setSearchParams({})}
             >
               Limpar filtros
             </button>
