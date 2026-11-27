@@ -1,4 +1,25 @@
+
 import api from './api'
+
+export const autenticacaoApi = {
+  async entrar(email, senha) {
+    const response = await api.post('/Autenticacao/login', {
+      email,
+      senha,
+    })
+
+    return response.data.data
+  },
+
+  async sair() {
+    await api.post('/Autenticacao/logout')
+  },
+
+  async obterUsuarioAtual() {
+    const response = await api.get('/Autenticacao/eu')
+    return response.data.data
+  },
+}
 
 export const jogoApi = {
   async listar(params = {}) {
