@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom'
 import Layout from './layouts/Layout'
 import Catalogo from './pages/Catalogo'
 import DetalheJogo from './pages/DetalheJogo'
+import Login from './pages/Login'
 import NaoEncontrada from './pages/NaoEncontrada'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Catalogo />} />
         <Route path="/jogos/:id" element={<DetalheJogo />} />
+        <Route path="/login" element={<Login />} />
         <Route path="*" element={<NaoEncontrada />} />
       </Route>
     </Routes>

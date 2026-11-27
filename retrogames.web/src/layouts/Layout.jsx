@@ -1,6 +1,28 @@
-import { Link, Outlet } from 'react-router-dom'
+
+import { Link, Outlet, useNavigate } from 'react-router-dom'
+
+import { useAutenticacao } from '../contexts/AutenticacaoContext'
 
 function Layout() {
+  const navigate = useNavigate()
+
+  const {
+    usuario,
+    estaCarregando,
+    estaAutenticado,
+    ehAdministrador,
+    sair,
+  } = useAutenticacao()
+
+  async function handleSair() {
+    try {
+      await sair()
+      navigate('/', { replace: true })
+    } catch {
+      navigate('/', { replace: true })
+    }
+  }
+
   return (
     <div className="d-flex flex-column min-vh-100">
       <header>
@@ -23,12 +45,73 @@ function Layout() {
             </button>
 
             <div className="collapse navbar-collapse" id="menuPrincipal">
-              <ul className="navbar-nav ms-auto">
+              <ul className="navbar-nav ms-auto align-items-lg-center">
                 <li className="nav-item">
                   <Link className="nav-link" to="/">
                     Catálogo
                   </Link>
                 </li>
+
+                {!estaCarregando && !estaAutenticado && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/login">
+                      Entrar
+                    </Link>
+                  </li>
+                )}
+
+                {!estaCarregando && estaAutenticado && (
+                  <>
+                    {ehAdministrador && (
+                      <li className="nav-item dropdown">
+                        <button
+                          className="nav-link dropdown-toggle btn btn-link"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          Administração
+                        </button>
+
+                        <ul className="dropdown-menu dropdown-menu-end">
+                          <li>
+                            <Link
+                              className="dropdown-item"
+                              to="/admin/jogos"
+                            >
+                              Jogos
+                            </Link>
+                          </li>
+
+                          <li>
+                            <Link
+                              className="dropdown-item"
+                              to="/admin/plataformas"
+                            >
+                              Plataformas
+                            </Link>
+                          </li>
+                        </ul>
+                      </li>
+                    )}
+
+                    <li className="nav-item">
+                      <span className="nav-link">
+                        Olá, {usuario.nome}
+                      </span>
+                    </li>
+
+                    <li className="nav-item">
+                      <button
+                        type="button"
+                        className="nav-link btn btn-link"
+                        onClick={handleSair}
+                      >
+                        Sair
+                      </button>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
           </div>
